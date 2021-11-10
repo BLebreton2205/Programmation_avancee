@@ -1,0 +1,19 @@
+Developper un grapheur de fonction qui utilise un evaluateur pour afficher une fonction mathematique 
+à une variable comme vu en cours.
+
+Ce grapheur présente les fonctionnalités suivantes:
+- Affichage dynamique de fonctions (drag(recalcul du repere), zoom)
+- Option pour le calcul automatique du pas (nombre de points min ???) en fonction de l'echelle
+- Affichage d'infos(x,y,f(x),refresh... voir photo)
+- Ajout d'autres fonctionnalités: exemple: tracé de plusieurs courbes / couleur... (voir outils existants...)
+
+-----------------------------------------------------------------
+
+Compte rendu de projet :
+Archive contenant:
+- Les sources (.java)
+- Les classes (.class)
+- un PDF(2 ou 3 pages):
+	* Lancement du programme (joindre un exe?)
+	* partie evaluateur (fonctionnement + comment le tester ? fonction main separée ?)
+	* Grapher + captures d'écran

@@ -47,22 +47,17 @@ public class Evaluateur {
 		}
 		
 	}
+
 	
 	public static void main(String[] args) {
-		String s = "3*x+2";
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Entrer une fonction :");
+		//String s = "3*x+2";
+		String s = sc.nextLine();
+		System.out.println("x = ");
+		float x = sc.nextFloat();
 		Noeud n = Analyse(s);
 		System.out.println(n.toString());
-		System.out.println(n.eval(1));
-		
-		
-		/*
-		Noeud n1 = new Valeur(3);
-		Noeud n2 = new Mult(
-				new Variable(),
-				new Valeur(2));
-		Noeud n3 = new Plus(n1, n2);
-		System.out.println(n3.toString());
-		System.out.println(n3.eval(1));
-		*/
+		System.out.println(n.eval(x));
 	}
 }
