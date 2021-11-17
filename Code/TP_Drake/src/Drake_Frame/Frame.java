@@ -9,7 +9,7 @@ import java.util.Vector;
 
 import javax.swing.*; 
 
-public class Frame extends JFrame implements ActionListener, ChangeListener, Runnable{
+public class Frame extends JFrame implements ActionListener, ChangeListener{
 	JPanel panel = new JPanel();
 	JLabel label = new JLabel("N = (R*) * fp * ne * fl * fi * fc * L");
     JSlider SliderR = new JSlider(0, 100, 0);
@@ -33,7 +33,7 @@ public class Frame extends JFrame implements ActionListener, ChangeListener, Run
     JSlider SliderL = new JSlider(0, 100000, 0);
     JLabel labelL1 = new JLabel("L");
     JLabel labelL2 = new JLabel("0");
-    JLabel N = new JLabel("N =");
+    JLabel N = new JLabel("N = ");
     JLabel result = new JLabel("0");
     GridBagConstraints c = new GridBagConstraints();
     GridBagConstraints c1 = new GridBagConstraints();
@@ -41,7 +41,7 @@ public class Frame extends JFrame implements ActionListener, ChangeListener, Run
     JButton start = new JButton("Start");
     JButton stop = new JButton("Stop");
     Thread t;
-    SwingWorker worker;
+    SwingWorker<String, Integer> worker;
     
 	public Frame() {
         this.setTitle("Équation de DRAKE");
@@ -51,6 +51,9 @@ public class Frame extends JFrame implements ActionListener, ChangeListener, Run
         
         panel.setLayout(new GridBagLayout());
 
+        Font font = new Font("Arial",Font.BOLD,20);
+        label.setFont(font);
+        
         c1.fill = GridBagConstraints.VERTICAL;
         c1.gridwidth = GridBagConstraints.REMAINDER;
         c1.gridx = 0;
@@ -100,8 +103,6 @@ public class Frame extends JFrame implements ActionListener, ChangeListener, Run
         panel.add(stop, c);
         
         this.add(panel);
-
-        t = new Thread(this);
 		
 		setVisible(true);
 	}
@@ -141,7 +142,7 @@ public class Frame extends JFrame implements ActionListener, ChangeListener, Run
 			N = 10*0.5*2*1*5000*fl/fi*fc;
 		}
 		SliderR.setValue(10);
-		Sliderfp.setValue(5);
+		Sliderfp.setValue(50);
 		Sliderne.setValue(2*100);
 		SliderL.setValue(5000);
 		Sliderfl.setValue((int)(fl*100));
@@ -150,7 +151,7 @@ public class Frame extends JFrame implements ActionListener, ChangeListener, Run
 
 		labelR2.setText("" + 10);
 		labelfp2.setText("" + 0.5);
-		labelne2.setText("" + 0.2);
+		labelne2.setText("" + 2);
 		labelL2.setText("" + 5000);
 		BigDecimal bd = new BigDecimal(fl).setScale(2, RoundingMode.HALF_UP);
 		labelfl2.setText("" + bd.doubleValue()); 
@@ -164,7 +165,7 @@ public class Frame extends JFrame implements ActionListener, ChangeListener, Run
 	}
 	
 	public static void main(String [] args){
-		JFrame frame = new Frame();
+		new Frame();
 	}
 	
 	public void stateChanged(ChangeEvent e){ 
@@ -179,20 +180,11 @@ public class Frame extends JFrame implements ActionListener, ChangeListener, Run
 		double value = SliderR.getValue() * Sliderfp.getValue()/100d * Sliderne.getValue()/100d * Sliderfl.getValue()/100d * Sliderfi.getValue()/100d * Sliderfc.getValue()/100d * SliderL.getValue();
 		result.setText("" + value);
 	} 
-
 	
-	public void run() {
-		while(true) {
-			try {
-				TrouveLaVie();
-			}catch(Exception e) {;}
-		}
-	}
-	
-	public void Lenomqutuveuxonsenfou() {
-		worker = new SwingWorker() {
+	public void AutoVie() {
+		worker = new SwingWorker<String,Integer>() {
 
-			protected Object doInBackground() throws Exception {
+			protected String doInBackground() throws Exception {
 				String a = "a";
 				while(a.equals(a)) {
 					TrouveLaVie();
@@ -203,19 +195,14 @@ public class Frame extends JFrame implements ActionListener, ChangeListener, Run
 		};
 		worker.execute();
 	}
-	
-	public void AutoVie() {
-		
-	}
 
-	@Override
 	public void actionPerformed(ActionEvent e) {
 		switch(e.getActionCommand()) {
 			case "Génère":
 				TrouveLaVie();
 				break;
 			case "Start":
-				Lenomqutuveuxonsenfou();
+				AutoVie();
 				break;
 			case "Stop":
 				try {

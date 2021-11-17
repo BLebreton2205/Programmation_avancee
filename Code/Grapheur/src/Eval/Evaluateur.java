@@ -2,11 +2,12 @@ package Eval;
 import java.util.Scanner;
 
 public class Evaluateur {
-
-	public static double f(double x) {
-		return 3.0 + x;
-		
-	}
+    private Noeud node;
+	
+	public Evaluateur( String s ) throws Exception {
+        this.node = Analyse(s);
+        System.out.println( node.toString() );
+    }
 	
 	public static Noeud Analyse(String s) {
 		int index;
@@ -19,6 +20,26 @@ public class Evaluateur {
 			fg = Analyse(s1);
 			fd = Analyse(s2);
 			Noeud n = new Plus(fg,fd);
+			return n;
+		}
+		
+		index = s.indexOf("-");
+		if (index !=-1) {
+			s1 = s.substring(0,index);
+			s2 = s.substring(index+1,s.length());
+			fg = Analyse(s1);
+			fd = Analyse(s2);
+			Noeud n = new Moins(fg,fd);
+			return n;
+		}
+		
+		index = s.indexOf("/");
+		if (index !=-1) {
+			s1 = s.substring(0,index);
+			s2 = s.substring(index+1,s.length());
+			fg = Analyse(s1);
+			fd = Analyse(s2);
+			Noeud n = new Divise(fg,fd);
 			return n;
 		}
 
@@ -48,16 +69,23 @@ public class Evaluateur {
 		
 	}
 
+	public float eval( float x ) {
+        return node.eval( x );
+    }
 	
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
+		int index;
+		float x = 0;
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Entrer une fonction :");
-		//String s = "3*x+2";
 		String s = sc.nextLine();
-		System.out.println("x = ");
-		float x = sc.nextFloat();
+		index = s.indexOf("x");
+		if (index !=-1) {
+			System.out.println("x = ");
+			x = sc.nextFloat();
+		}
 		Noeud n = Analyse(s);
 		System.out.println(n.toString());
 		System.out.println(n.eval(x));
-	}
+	}*/
 }

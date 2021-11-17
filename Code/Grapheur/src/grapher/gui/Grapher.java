@@ -1,169 +1,195 @@
-package grapher;
+package grapher.gui;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.function.Function;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import Eval.Evaluateur;
 
 public class Grapher extends JPanel {
-
-	float minX = -8;
-	float maxX = 8;
-	float minY = -8;
-	float maxY = -8;
-	
-	float pas = 0.01f;
-	
-	float rangeX = 0;
-	float rangeY = 0;
-	
-	float Ox = 0;
-	float Oy = 0;
-	float gridX = 1.0f;
-	float gridY = 1.0f;
-	
-	ActionPanel ap;
-	
-	boolean autoPas = false;
+	private int                 longueur, largueur;
+    private float              pas, Xmin, Xmax, Ymin, Ymax, offsetX, offsetY, pxlX, pxlY;
+    private boolean             autoPas;
+    private Evaluateur			fct;
+    private final float        defaultXmin   = -8;
+    private final float        defaultXmax   = 8;
+    private final float        defaultYmin   = -8;
+    private final float        defaultYmax   = 8;
+    private final float        defaultPas    = 0.01f;
+    private final String        defaultFct    = "x*x";
 	
 	public Grapher() {
-		super();
-		this.setBorder( BorderFactory.createLineBorder( Color.BLACK ) );
-		
-		/*evaluateur = e;
-		G
-		t
-		t*/
-	}
-	
-	public float fonct(float x) {
-		float e = 1/*Eval.Evaluateur.Analyse(x)*/;
-		return e;
-	}
-	
-	public void setaActionpannel(ActionPanel ap) {
-		this.ap = ap;
-	}
-	
-	/*public void reInitCoord() {
-		ap.txmin.setText(new Float(Math.round(minX * 10000) / 10000f.toString()));
-		ap.txmax.setText(new Float(Math.round(maxX * 10000) / 10000f.toString()));
-		ap.tymin.setText(new Float(Math.round(minY * 10000) / 10000f.toString()));
-		ap.tymax.setText(new Float(Math.round(maxY * 10000) / 10000f.toString()));
-	}*/
-	
-	public void initRapports() {
-		int w = getSize().width;
-		rangeX = (maxX - minX) / w;
-		int h = getSize().height;
-		rangeY = (maxY - minY) / h;
-		
-	}
-	
-	public void drawFonc(Graphics g) {
-		g.setColor(Color.RED);
-		if (pas == 0f)
-			pas = 0.001f;
-		for (float x = minX; x < maxX;) {
-			double y = fonct(x);
-			float xi = Ox + (x / rangeX);
-			float yi = Oy - (((float) y) / rangeY);
-			g.drawLine(Math.round(xi), Math.round(yi), Math.round(xi), Math.round(yi));
+        super();
+        this.setBorder( BorderFactory.createLineBorder( Color.white ) );
+        this.setBackground( Color.WHITE );
+        
+        Xmin = defaultXmin;
+        Xmax = defaultXmax;
+        Ymin = defaultYmin;
+        Ymax = defaultYmax;
+        pas = defaultPas;
+        autoPas = false;
+        
+        try {
+			fct = new Evaluateur(defaultFct);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 	
-	public void zoomPlus() {
-		float dx = -(maxX - minX) / 5f;
-		float dy = -(maxY - minY) / 5f;
-		minX = minX + dx;
-		maxX = maxX - dx;
-		minY = minY + dy;
-		maxY = maxY - dy;
-		//reInitCoord();
-		/*if (autoPas) {
-			pas = rangeX / 3f;
-			//ap.tpas/SetTex
-		}*/
-		repaint();		
-	}
-	
-	public void zoomMoins() {
-		float dx = -(maxX - minX) / 5f;
-		float dy = -(maxY - minY) / 5f;
-		minX = minX - dx;
-		maxX = maxX + dx;
-		minY = minY - dy;
-		maxY = maxY + dy;
-		//reInitCoord();
-		/*if (autoPas) {
-			pas = rangeX / 3f;
-			//ap.tpas/SetTex
-		}*/
-		repaint();
-		
-	}
-	
 	public void paint(Graphics g) {
-		if (true)//!drag)
-			initRapports();
-		initOrigine();
-		drawAxes(g);
-		drawFonc(g);
-	}
+        super.paintComponent( g );
+        if ( longueur != 0 || largueur != 0 ) {
+	        drawAxes( g );
+	        drawFonc( g );
+        }
+	}	
 
+	public void setFct( Evaluateur newFct ) {
+		fct = newFct;
+        repaint();
+    }
+	
 	public void drawAxes(Graphics g) {
-		g.setColor( Color.BLACK );
+		g.setColor( Color.DARK_GRAY );
 		drawAbscisse(g);
 		drawOrdonnee(g);
 	}
 	
 	public void drawAbscisse(Graphics g) {
-		g.drawLine(0, Math.round(Oy), getSize().width, Math.round(Oy));
-		int tailleX = 8 - Math.round((maxX - minX) / (gridX * 10));
-		if (tailleX <= 0)
-			tailleX = -1;
-		for (float x = -gridX; x> minX;) {
-			float xi = Ox + (x / rangeX);
-			float yi = Oy;
-			g.drawLine(Math.round(xi), Math.round(yi), Math.round(xi), Math.round(yi)-tailleX);
-			x += gridX;
-		}
-		for (float x = gridX; x < maxX;) {
-			float xi = Ox + (x / rangeX);
-			float yi = Oy;
-			g.drawLine(Math.round(xi), Math.round(yi), Math.round(xi), Math.round(yi)-tailleX);
-			x += gridX;
-		}
+        int gradLength = (int) Math.min( 9, 60 / ( Xmax - Xmin ) );
+        if ( Ymin <= 0 && Ymax >= 0 ) {
+            g.drawLine( 0, (int) offsetY, longueur, (int) offsetY );
+            for ( float i = offsetX; i > 0; i -= pxlX ) {
+                g.drawLine( (int) i, (int) ( offsetY - gradLength ), (int) i, (int) offsetY );
+            }
+            for ( float i = offsetX + pxlX; i < longueur; i += pxlX ) {
+                g.drawLine( (int) i, (int) ( offsetY - gradLength ), (int) i, (int) offsetY );
+            }
+        }
 	}
 	
 	public void drawOrdonnee(Graphics g) {
-		g.drawLine(Math.round(Ox), 0, Math.round(Ox), getSize().height);
-		int tailleY = 8 - Math.round((maxY - minY) / (gridY * 10));
-		if (tailleY <= 0)
-			tailleY = -1;
-		for (float y = -gridY; y> minY;) {
-			float yi = -(y / rangeY) + Oy;
-			float xi = Ox;
-			g.drawLine(Math.round(xi), Math.round(yi), Math.round(xi)+tailleY, Math.round(yi));
-			y += gridY;
-		}
-		for (float y = gridY; y < maxY;) {
-			float yi = -(y / rangeY) + Oy;
-			float xi = Ox;
-			g.drawLine(Math.round(xi), Math.round(yi), Math.round(xi)+tailleY, Math.round(yi));
-			y += gridY;
-		}
+        int gradLength = (int) Math.min( 9, 60 / ( Xmax - Xmin ) );
+        if ( Xmin <= 0 && Xmax >= 0 ) {
+            g.drawLine( (int) offsetX, 0, (int) offsetX, largueur );
+            for ( float i = offsetY; i > 0; i -= pxlY ) {
+                g.drawLine( (int) ( offsetX + gradLength ), (int) i, (int) offsetX, (int) i );
+            }
+            for ( float i = offsetY + pxlY; i < largueur; i += pxlY ) {
+                g.drawLine( (int) ( offsetX + gradLength ), (int) i, (int) offsetX, (int) i );
+            }
+        }
 	}
 
-	public void initOrigine() {
-		Ox = -minX / rangeX;
-		Oy = maxY / rangeY;
+	public void drawFonc(Graphics g) {
+		g.setColor(Color.RED);
+		for ( float i = Xmin; i < Xmax; i += pas ) {
+			float[] coords = getPxlCoords( i, fct.eval( (float) i ) );
+			if ( coords[1] >= 0 && coords[1] <= largueur )
+                g.fillRect( (int) coords[0], (int) coords[1], 3/2, 3/2 );
+        }
 	}
 	
-	/*public void setAutoPas( boolean b ) {
+	private float[] getPxlCoords( float x, float y ) {
+		float[] coords = new float[2];
+        coords[0] = offsetX + x * pxlX;
+        coords[1] = offsetY - y * pxlY;
+        return coords;
+    }
+
+	public float[] getMathsCoords( float x, float y ) {
+		float[] coords = new float[2];
+        coords[0] = ( x - offsetX ) / pxlX;
+        coords[1] = ( offsetY - y ) / pxlY;
+        return coords;
+    }
+
+	private void updateRatio() {
+        pxlX = longueur / ( Xmax - Xmin );
+        pxlY = largueur / ( Ymax - Ymin );
+        offsetX = ( longueur - Xmax * pxlX );
+        offsetY = ( largueur + Ymin * pxlY );
+    }
+
+	private void calculatePas() {
+        pas = 1 / pxlX;
+    }
+	
+	public void zoomPlus() {
+		float dx = -(Xmax - Xmin) / 5f;
+		float dy = -(Ymax - Ymin) / 5f;
+		Xmin = Xmin - dx;
+		Xmax = Xmax + dx;
+		Ymin = Ymin - dy;
+		Ymax = Ymax + dy;
+        updateRatio();
+        if ( autoPas )
+            calculatePas();
+		repaint();		
+	}
+	
+	public void zoomMoins() {
+		float dx = -(Xmax - Xmin) / 5f;
+		float dy = -(Ymax - Ymin) / 5f;
+		Xmin = Xmin + dx;
+		Xmax = Xmax - dx;
+		Ymin = Ymin + dy;
+		Ymax = Ymax - dy;
+        updateRatio();
+        if ( autoPas )
+            calculatePas();
+		repaint();
+		
+	}
+	
+	public void resetPos() {
+        this.Xmin = defaultXmin;
+        this.Xmax = defaultXmax;
+        this.Ymin = defaultYmin;
+        this.Ymax = defaultYmax;
+        updateRatio();
+        if ( autoPas )
+            calculatePas();
+        else
+            this.pas = defaultPas;
+        repaint();
+    }
+	
+    public void setInfos( float Xmin, float Xmax, float Ymin, float Ymax, float pas ) {
+        this.Xmin = Xmin;
+        this.Xmax = Xmax;
+        this.Ymin = Ymin;
+        this.Ymax = Ymax;
+        this.pas = pas;
+        updateRatio();
+        repaint();
+    }
+
+    public void move( float dx, float dy ) {
+        Xmin -= dx / pxlX;
+        Xmax -= dx / pxlX;
+        Ymin += dy / pxlY;
+        Ymax += dy / pxlY;
+        updateRatio();
+        repaint();
+    }
+    
+    public void setDim( int longueur, int largueur ) {
+        this.longueur = longueur;
+        this.largueur = largueur;
+        updateRatio();
+        if ( autoPas )
+            calculatePas();
+    }
+    
+    public void setAutoPas( boolean b ) {
         autoPas = b;
         if ( autoPas )
             calculatePas();
@@ -171,9 +197,27 @@ public class Grapher extends JPanel {
             pas = defaultPas;
         repaint();
     }
-	
-	private void calculatePas() {
-        // La valeur du pas est proportionnelle à l'echelle
-        pas = 1 / dx;
-    }*/
+
+    public Evaluateur getFct() {
+        return fct;
+    }
+    public float getPas() {
+        return pas;
+    }
+
+    public float getXmin() {
+        return Xmin;
+    }
+
+    public float getXmax() {
+        return Xmax;
+    }
+
+    public float getYmin() {
+        return Ymin;
+    }
+
+    public float getYmax() {
+        return Ymax;
+    }
 }
