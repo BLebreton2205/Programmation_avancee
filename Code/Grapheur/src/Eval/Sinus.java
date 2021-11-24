@@ -1,16 +1,17 @@
 package Eval;
 
-public class Sinus extends Fonction {
+public class Sinus extends Noeud {
 
-	public Sinus(Noeud f) {
-		super(f);
+	Noeud value;
+	public Sinus(Noeud value) {
+		this.value = value;
 	}
 		
 	public float eval(float x) {
-		return (float) Math.sin((double) f.eval(x));
+		return (float) Math.sin((double) value.eval(x));
 	}
 	
 	public String toString() {
-		return "(sin("+f.toString()+")";
+		return "sin("+value.toString()+")";
 	}
 }

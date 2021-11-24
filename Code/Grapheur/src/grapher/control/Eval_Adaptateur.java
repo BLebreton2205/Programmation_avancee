@@ -16,7 +16,7 @@ public class Eval_Adaptateur {
 	private Panel_Eval Sud;
 	private Panel_Coord Nord;
 	
-	public Eval_Adaptateur( Grapher  Centre, Panel_Eval Sud, Panel_Coord Nord ) {
+	public Eval_Adaptateur( Grapher Centre, Panel_Eval Sud, Panel_Coord Nord ) {
 	    this.Centre = Centre;
 	    this.Nord = Nord;
 	    this.Sud = Sud;
