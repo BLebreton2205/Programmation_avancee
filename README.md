@@ -97,6 +97,4 @@ public class Mult extends NoeudBinaire {
 
 ### La classe Evaluateur
 
-​	Et enfin, la classe qui englobe ce package : la classe **Evaluateur**. Elle va analyser la chaîne de caractère et créer l'arbre au fur et à mesure afin de renvoyer le résultat. Voici le résultat :
-
-![image-20211126232632264](C:\Users\lebre\AppData\Roaming\Typora\typora-user-images\image-20211126232632264.png)
+​	Et enfin, la classe qui englobe ce package : la classe **Evaluateur**. Elle va analyser la chaîne de caractère et créer l'arbre au fur et à mesure afin de renvoyer le résultat. 
